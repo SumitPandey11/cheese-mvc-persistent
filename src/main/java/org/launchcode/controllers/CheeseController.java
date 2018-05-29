@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.validation.Valid;
 
@@ -52,6 +53,8 @@ public class CheeseController {
 
         if (errors.hasErrors()) {
             model.addAttribute("title", "Add Cheese");
+            model.addAttribute("cheese",newCheese);
+            model.addAttribute("categories", categoryDao.findAll());
             return "cheese/add";
         }
         Category cat = categoryDao.findOne(categoryId);
@@ -68,13 +71,49 @@ public class CheeseController {
     }
 
     @RequestMapping(value = "remove", method = RequestMethod.POST)
-    public String processRemoveCheeseForm(@RequestParam int[] cheeseIds) {
-
+    public String processRemoveCheeseForm(@RequestParam int[] cheeseIds, Model model) {
         for (int cheeseId : cheeseIds) {
-            cheeseDao.delete(cheeseId);
-        }
+            try {
+                cheeseDao.delete(cheeseId);
+            }
+            catch(Exception exception){
+                model.addAttribute("cheeses", cheeseDao.findAll());
+                String cn = cheeseDao.findOne(cheeseId).getName();
+                model.addAttribute("title", "Cannot Remove  " + cn + " Cheese because it is added in menu.");
+                return "cheese/remove";
 
+            }
+        }
         return "redirect:";
     }
 
+    @RequestMapping(value = "edit/{id}", method = RequestMethod.GET)
+    public String displayEditCheeseForm(@PathVariable int id , Model model) {
+
+        Cheese cheese = cheeseDao.findOne(id);
+        model.addAttribute("title", "Edit Cheese " + cheese.getName() + "(" + cheese.getId()+")");
+        model.addAttribute("cheese", cheese);
+        model.addAttribute("categories", categoryDao.findAll());
+        return "cheese/edit";
+    }
+
+    @RequestMapping(value = "edit/{id}", method = RequestMethod.POST)
+    public String displayEditCheeseForm(@ModelAttribute  @Valid Cheese newCheese,
+                                        Errors errors, @PathVariable int id, @RequestParam int categoryId, Model model) {
+
+        if(errors.hasErrors()){
+            model.addAttribute("title", "Edit Cheese " );
+            model.addAttribute("cheese", newCheese);
+            model.addAttribute("categories", categoryDao.findAll());
+            return "cheese/edit";
+        }
+
+        Cheese cheese = cheeseDao.findOne(id);
+        cheese.setCategory(categoryDao.findOne(categoryId));
+        cheese.setDescription(newCheese.getDescription());
+        cheese.setName(newCheese.getName());
+        cheeseDao.save(cheese);
+
+        return "redirect:/cheese";
+    }
 }

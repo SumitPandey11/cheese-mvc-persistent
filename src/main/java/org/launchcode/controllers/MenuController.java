@@ -73,7 +73,7 @@ public class MenuController {
     }
 
     @RequestMapping(value = "add-item", method = RequestMethod.POST)
-    public String processAddItem(Model model, @ModelAttribute @Valid AddMenuItemForm addMenuItemForm, @RequestParam int cheeseId, @RequestParam int menuId,  Errors errors){
+    public String processAddItem( Model model, @ModelAttribute @Valid AddMenuItemForm addMenuItemForm, @RequestParam int cheeseId, @RequestParam int menuId,  Errors errors){
         if(errors.hasErrors()){
             model.addAttribute("title", "Add item to menu: " + addMenuItemForm.getMenu().getName());
             model.addAttribute("form", addMenuItemForm);

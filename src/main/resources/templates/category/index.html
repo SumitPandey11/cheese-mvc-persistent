@@ -6,9 +6,11 @@
 <h1 th:text="${title}">Default Title</h1>
 
 <nav th:replace="fragments :: navigation"></nav>
-<ul>
-    <li th:each=" category : ${categories}" th:text="${category.name}"></li>
+<div>
+<ul class="list-group">
+    <li class="list-group-item" th:each=" category : ${categories}" th:text="${category.name}"></li>
 </ul>
+</div>
 <div>
 <a href="/category/add">Add Category</a>
 </div>

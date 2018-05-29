@@ -48,6 +48,6 @@ public class Menu {
     }
 
     public void addItem(Cheese item){
-
+            cheeses.add(item);
     }
 }
