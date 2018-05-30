@@ -4,17 +4,16 @@ import org.launchcode.models.Category;
 import org.launchcode.models.Cheese;
 import org.launchcode.models.data.CategoryDao;
 import org.launchcode.models.data.CheeseDao;
+import org.launchcode.models.forms.EditCheeseForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by LaunchCode
@@ -91,14 +90,15 @@ public class CheeseController {
     public String displayEditCheeseForm(@PathVariable int id , Model model) {
 
         Cheese cheese = cheeseDao.findOne(id);
+        EditCheeseForm editCheeseForm = new EditCheeseForm(id, cheese.getName(),cheese.getDescription(), cheese.getCategory().getId());
         model.addAttribute("title", "Edit Cheese " + cheese.getName() + "(" + cheese.getId()+")");
-        model.addAttribute("cheese", cheese);
+        model.addAttribute("cheese", editCheeseForm);
         model.addAttribute("categories", categoryDao.findAll());
         return "cheese/edit";
     }
 
     @RequestMapping(value = "edit/{id}", method = RequestMethod.POST)
-    public String displayEditCheeseForm(@ModelAttribute  @Valid Cheese newCheese,
+    public String displayEditCheeseForm(@ModelAttribute  @Valid EditCheeseForm newCheese,
                                         Errors errors, @PathVariable int id, @RequestParam int categoryId, Model model) {
 
         if(errors.hasErrors()){
@@ -115,5 +115,23 @@ public class CheeseController {
         cheeseDao.save(cheese);
 
         return "redirect:/cheese";
+    }
+
+    @RequestMapping(value="category/{id}", method = RequestMethod.GET)
+    public String listAllCheeseOfSameCategory(@PathVariable int id, Model model){
+
+        Iterable<Cheese> cheeses = cheeseDao.findAll();
+        ArrayList<Cheese> cheeseOfSameCategory = new ArrayList<>();
+        Category category = categoryDao.findOne(id);
+        for(Cheese cheese : cheeses){
+            if(cheese.getCategory().getId() == category.getId()) {
+                cheeseOfSameCategory.add(cheese);
+            }
+        }
+
+        model.addAttribute("cheeses", cheeseOfSameCategory);
+        model.addAttribute("title", "Cheeses of category " + category.getName());
+
+        return "cheese/index";
     }
 }

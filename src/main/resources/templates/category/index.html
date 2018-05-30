@@ -8,7 +8,12 @@
 <nav th:replace="fragments :: navigation"></nav>
 <div>
 <ul class="list-group">
-    <li class="list-group-item" th:each=" category : ${categories}" th:text="${category.name}"></li>
+    <li class="list-group-item" th:each=" category : ${categories}" >
+        <a th:href="@{'/cheese/category/' + ${category.id}} ">
+            <span th:text="${category.name}" th:remove="tag"></span>
+        </a>
+
+    </li>
 </ul>
 </div>
 <div>
