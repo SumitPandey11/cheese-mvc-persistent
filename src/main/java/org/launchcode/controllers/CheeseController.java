@@ -92,26 +92,25 @@ public class CheeseController {
         Cheese cheese = cheeseDao.findOne(id);
         EditCheeseForm editCheeseForm = new EditCheeseForm(id, cheese.getName(),cheese.getDescription(), cheese.getCategory().getId());
         model.addAttribute("title", "Edit Cheese " + cheese.getName() + "(" + cheese.getId()+")");
-        model.addAttribute("cheese", editCheeseForm);
+        model.addAttribute("editCheeseForm", editCheeseForm);
         model.addAttribute("categories", categoryDao.findAll());
         return "cheese/edit";
     }
 
     @RequestMapping(value = "edit/{id}", method = RequestMethod.POST)
-    public String displayEditCheeseForm(@ModelAttribute  @Valid EditCheeseForm newCheese,
+    public String displayEditCheeseForm(@ModelAttribute  @Valid EditCheeseForm editCheeseForm,
                                         Errors errors, @PathVariable int id, @RequestParam int categoryId, Model model) {
 
         if(errors.hasErrors()){
             model.addAttribute("title", "Edit Cheese " );
-            model.addAttribute("cheese", newCheese);
             model.addAttribute("categories", categoryDao.findAll());
             return "cheese/edit";
         }
 
         Cheese cheese = cheeseDao.findOne(id);
         cheese.setCategory(categoryDao.findOne(categoryId));
-        cheese.setDescription(newCheese.getDescription());
-        cheese.setName(newCheese.getName());
+        cheese.setDescription(editCheeseForm.getDescription());
+        cheese.setName(editCheeseForm.getName());
         cheeseDao.save(cheese);
 
         return "redirect:/cheese";
