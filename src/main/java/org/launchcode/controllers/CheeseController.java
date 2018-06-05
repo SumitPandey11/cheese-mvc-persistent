@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by LaunchCode
@@ -52,7 +51,7 @@ public class CheeseController {
 
         if (errors.hasErrors()) {
             model.addAttribute("title", "Add Cheese");
-            model.addAttribute("cheese",newCheese);
+            //model.addAttribute("cheese",newCheese);
             model.addAttribute("categories", categoryDao.findAll());
             return "cheese/add";
         }
